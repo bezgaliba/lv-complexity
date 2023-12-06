@@ -40,19 +40,33 @@ class ComplexityEval:
         asl = word_count / sentences_count
         return asl
 
-    def split_syllables(self, word):
-        vowels = 'aeiouāēīū'
-        consonants = 'bcčdfgģhjkķlļmnņprsštvzž'
-        pattern = rf"([{consonants}]?[{vowels}]+(?:[{consonants}](?![{vowels}]))?)"
-        syllables = re.sub(pattern, r'\1-', word)
-        return syllables
+    def replace_hyphens(self, data):
+        return data.replace('<span class="hyphen">•</span>', '-')
 
-    def split_words_to_syllables(self, word_list):
-        syllables = [self.split_syllables(word) for word in word_list]
-        return syllables
+    def syllableize(self, wordList):
+        session = requests.Session()
+        syllablesList = []
+        response = session.get('https://www.ushuaia.pl/hyphen', verify=False)
+        cookie = session.cookies.get_dict()
+        if response.status_code == 200:
+            if response:
+                print(f'Pieslēgts cookie auth: ', cookie['hyphen'])
+            else:
+                print(f"Cookie auth error: {response.status_code}")
+        for word in wordList:
+            url = f"https://www.ushuaia.pl/hyphen/hyphenate.php?word={word}&lang=lv_LV"
+            response = requests.get(url, cookies=cookie, verify=False)
+            if response.status_code == 200:
+                data = response.text
+                cleanedData = self.replace_hyphens(data)
+                syllablesList.append(cleanedData)
+            else:
+                print(f"Cookie auth error: {response.status_code}")
+        return syllablesList
 
     def ASW(self, syllables):
-        hyphen_counts = [syllable.count('-') for syllable in syllables]
+        hyphen_counts = [syllable.count('-') + 1 for syllable in syllables]
+        print(hyphen_counts)
         asw = sum(hyphen_counts) / len(hyphen_counts) if len(hyphen_counts) > 0 else 0
         return asw
 
@@ -87,6 +101,7 @@ class ComplexityEval:
         words_to_remove = []
         for word in syllables:
             hyphen_count = word.count('-')
+            hyphen_count = hyphen_count + 1
             if hyphen_count < 3:
                 words_to_remove.append(word)
 
@@ -196,7 +211,7 @@ class ComplexityEval:
         
         words = self.tokenize()
 
-        syllables = self.split_words_to_syllables(words)
+        syllables = self.syllableize(words)
         print("Zilbju saraksts:\n", syllables, '\n')
 
         asw = self.ASW(syllables)
@@ -236,7 +251,7 @@ class ComplexityEval:
             sentence_type = self.sentence_structure_define(birkas)
             if sentence_type in sentence_types_count:
                 sentence_types_count[sentence_type] += 1
-          2  print("#",i,f"Teikuma tips: ", sentence_type, '\n\n')
+            print("#",i,f"Teikuma tips: ", sentence_type, '\n\n')
         
         print("Teksta kopējās teikuma uzbūves daļas: \n",sentence_types_count)
 
