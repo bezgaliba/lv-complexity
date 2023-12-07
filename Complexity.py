@@ -4,6 +4,7 @@ import re
 import nltk
 import spacy
 from nltk.tokenize import sent_tokenize, word_tokenize
+requests.packages.urllib3.disable_warnings()
 
 
 class ComplexityEval:
@@ -201,6 +202,16 @@ class ComplexityEval:
                 fields.append(field_dict)
         return fields
 
+    def LVNLPAnalysis(self):
+        text = self.text
+        api_url='https://nlp.ailab.lv/api/nlp'
+        steps = None or ['tokenizer', 'morpho', 'parser', 'ner']
+        r = requests.post(api_url, json={'data': {'text': text}, 'steps': steps})
+        data = r.json()
+        data = data['data']
+        data = json.dumps(data, indent=2, ensure_ascii=False)
+        return data
+
     def evaluate(self):
 
         print("----------------TEKSTA SAREŽĢĪTĪBA------------------------\n\n")
@@ -262,6 +273,10 @@ class ComplexityEval:
         analysedWords = [dict(t) for t in set(tuple(d.items()) for d in analysedWords if isinstance(d, dict))]
         formattedAnalysedWords = json.dumps(analysedWords, indent=4, ensure_ascii=False)
         print("Vārdu analīze:", formattedAnalysedWords)
+        print(sentences)
+
+        lvnlpanalysisData = self.LVNLPAnalysis()
+        print("LV NLP analīze: ", lvnlpanalysisData)
 
 def main():
     text = '''Viņa lasa, jo es negribu. Atskan zvans no kaimiņa. Studenti mācās universitātē, bet skolēni - skolā. Kad saule riet, zvaigznes parādās debesīs. Lai gan viņš ir prasmīgs vīrs, viņam nebija laika izdarīt savu darbu tāpēc, ka kārtība prasa laiku.'''
