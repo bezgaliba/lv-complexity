@@ -168,6 +168,19 @@ class ComplexityEval:
             
             results[key] = sentence_results
         return json.dumps(results, indent=2, ensure_ascii=False)
+
+    def average_comma_count(self):
+        sentences = self.text.split('.')
+        sentencesCount = len(sentences)-1
+        commaCount = 0
+        for sentence in sentences:
+            commaCount += sentence.count(',')
+        if sentencesCount > 0:
+            average = commaCount / sentencesCount
+            print(commaCount, sentencesCount)
+            return average
+        else:
+            return 0
         
     def getWordAnalysis(self, words):
         analysisList = []
@@ -273,10 +286,13 @@ class ComplexityEval:
         
         parsedAnalysisData = json.loads(lvnlpanalysisData)
         sentenceType = self.sentence_type(parsedAnalysisData)
-        print(sentenceType)
+        print("Teikumu uzbūve: ", sentenceType)
+
+        avgCommas = self.average_comma_count()
+        print("Vidējo komatu skaits teikumā: ", avgCommas)
 
 def main():
-    text = '''Dzīvnieks lido, lai varētu dzīvot, bet nevis dzert. Lai šādu dzīvesstilu uzturētu vajag ūdeni. Es neesmu zaļš, bet nevajag mani apcelt.'''
+    text = '''Dzīvnieks lido, lai varētu dzīvot, bet nevis dzert. Lai šādu dzīvesstilu uzturētu vajag ūdeni. Es neesmu zaļš, bet nevajag mani apcelt. Viņš sacīja: "Nav jau man grūti to izdarīt, ja vien būtu palīgs"'''
     evaluator = ComplexityEval(text)
     evaluator.evaluate()
 
