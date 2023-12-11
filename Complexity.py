@@ -141,37 +141,34 @@ class ComplexityEval:
             grade_meaning = "Nesekmīgi"
 
         return grade_meaning
-    
-    def sentence_structure(self, sentence):
-        url = f"http://api.tezaurs.lv:8182/morphotagger/{sentence}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.text
-            lines = data.split('\n')
-            modified_lines = ['\t\t'.join(line.split()[:2] + line.split()[3:]) for line in lines if line.strip()]
-            modified_data = '\n'.join(modified_lines)
-            return modified_data
-        else:
-            return f"Error: {response.status_code}"
 
-    def sentence_structure_define(self, posTags):
-        has_conjunctor = False
-        has_subordinator = False
-        for i in range(len(posTags) - 1):
-            if posTags[i] == 'zc' and posTags[i + 1] == 'cc' or posTags[i] == 'zc' and i < len(posTags) - 1 and posTags[i + 1] != 'cs':
-                has_conjunctor = True
-            if posTags[i] == 'zc' and posTags[i + 1] == 'cs' or posTags[i] == 'zc' and 'r0' in posTags[i + 1]:
-                has_subordinator = True
+    def sentence_type(self, json_data):
+        results = {}
+        for key, value in json_data.items():
+            sentences = value.get('sentences', [])
+            text = value.get('text', '')
 
-        if has_subordinator and has_conjunctor:
-            return "Jaukts salikts"
-        elif has_conjunctor:
-            return "Salikts sakārtots"
-        elif has_subordinator:
-            return "Salikts pakārtots"
-        else:
-            return "Vienkāršs"
-    
+            sentence_results = []
+            for sentence in sentences:
+                tags = {'cs': False, 'cc': False}
+                for token in sentence.get('tokens', []):
+                    if token['tag'] == 'cs':
+                        tags['cs'] = True
+                    if token['tag'] == 'cc':
+                        tags['cc'] = True
+                
+                if tags['cs'] and tags['cc']:
+                    sentence_results.append({'teikums': text, 'uzbuve': 'Salikts jaukts'})
+                elif tags['cs']:
+                    sentence_results.append({'teikums': text, 'uzbuve': 'Salikts pakārtots'})
+                elif tags['cc']:
+                    sentence_results.append({'teikums': text, 'uzbuve': 'Salikts sakārtots'})
+                else:
+                    sentence_results.append({'teikums': text, 'uzbuve': 'Nevaru noteikt'})
+            
+            results[key] = sentence_results
+        return json.dumps(results, indent=2, ensure_ascii=False)
+        
     def getWordAnalysis(self, words):
         analysisList = []
         for word in words:
@@ -202,15 +199,23 @@ class ComplexityEval:
                 fields.append(field_dict)
         return fields
 
-    def LVNLPAnalysis(self):
-        text = self.text
-        api_url='https://nlp.ailab.lv/api/nlp'
+    def LVNLPAnalysis(self, sentencesSplit):
+        api_url = 'https://nlp.ailab.lv/api/nlp'
+        results = {}
+        
         steps = None or ['tokenizer', 'morpho', 'parser', 'ner']
-        r = requests.post(api_url, json={'data': {'text': text}, 'steps': steps})
-        data = r.json()
-        data = data['data']
-        data = json.dumps(data, indent=2, ensure_ascii=False)
-        return data
+
+        for i, sentence in enumerate(sentencesSplit, start=1):
+            payload = {'data': {'text': sentence}, 'steps': steps}
+            r = requests.post(api_url, json=payload)
+            
+            if r.status_code == 200:
+                data = r.json().get('data')
+                results[f"Teikums #{i}"] = data
+            else:
+                results[f"Teikums #{i}"] = f"Error: {r.status_code}"
+        
+        return json.dumps(results, indent=2, ensure_ascii=False)
 
     def evaluate(self):
 
@@ -251,21 +256,6 @@ class ComplexityEval:
 
         sentences = self.tokenizeSent()
 
-        sentences_tags = []
-        sentence_types_count = {'Jaukts salikts': 0, 'Salikts sakārtots': 0, 'Salikts pakārtots': 0, 'Vienkāršs': 0}
-        for i, sentence in enumerate(sentences, start=1):
-            structure = self.sentence_structure(sentence)
-            print("#",i,f"Teikuma: '{sentence.strip()}' morfoloģiskās birkas:\n{structure}\n")
-            rindas = structure.split('\n')
-            birkas = [rinda.split('\t\t')[1] for rinda in rindas] 
-            # print("#",i,f"Teikuma birkas:", birkas, '\n')   
-            sentence_type = self.sentence_structure_define(birkas)
-            if sentence_type in sentence_types_count:
-                sentence_types_count[sentence_type] += 1
-            print("#",i,f"Teikuma tips: ", sentence_type, '\n\n')
-        
-        print("Teksta kopējās teikuma uzbūves daļas: \n",sentence_types_count)
-
         print("\n\n----------------Vārdu analīze------------------------\n")
 
         analysedWords = self.getWordAnalysis(words)
@@ -273,13 +263,20 @@ class ComplexityEval:
         analysedWords = [dict(t) for t in set(tuple(d.items()) for d in analysedWords if isinstance(d, dict))]
         formattedAnalysedWords = json.dumps(analysedWords, indent=4, ensure_ascii=False)
         print("Vārdu analīze:", formattedAnalysedWords)
-        print(sentences)
 
-        lvnlpanalysisData = self.LVNLPAnalysis()
+        print("\n\n----------------Morfoloģiskā analīze------------------------\n")
+
+        lvnlpanalysisData = self.LVNLPAnalysis(sentences)
         print("LV NLP analīze: ", lvnlpanalysisData)
 
+        print("\n\n----------------Sintaktiskā analīze------------------------\n")
+        
+        parsedAnalysisData = json.loads(lvnlpanalysisData)
+        sentenceType = self.sentence_type(parsedAnalysisData)
+        print(sentenceType)
+
 def main():
-    text = '''Viņa lasa, jo es negribu. Atskan zvans no kaimiņa. Studenti mācās universitātē, bet skolēni - skolā. Kad saule riet, zvaigznes parādās debesīs. Lai gan viņš ir prasmīgs vīrs, viņam nebija laika izdarīt savu darbu tāpēc, ka kārtība prasa laiku.'''
+    text = '''Dzīvnieks lido, lai varētu dzīvot, bet nevis dzert. Lai šādu dzīvesstilu uzturētu vajag ūdeni. Es neesmu zaļš, bet nevajag mani apcelt.'''
     evaluator = ComplexityEval(text)
     evaluator.evaluate()
 
