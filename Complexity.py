@@ -39,7 +39,7 @@ class ComplexityEval:
         sentences_count = len(sentences)
         # Aprēķina vidējo garumu teikumam.
         asl = word_count / sentences_count
-        return asl
+        return round(asl, 2)
 
     def replace_hyphens(self, data):
         return data.replace('<span class="hyphen">•</span>', '-')
@@ -69,13 +69,13 @@ class ComplexityEval:
         hyphen_counts = [syllable.count('-') + 1 for syllable in syllables]
         print(hyphen_counts)
         asw = sum(hyphen_counts) / len(hyphen_counts) if len(hyphen_counts) > 0 else 0
-        return asw
+        return round(asw, 2)
 
     def flesch_reading_ease(self, asl, asw):
         print("Vidēji zilbes: ", asw)
         print("Videji teikuma garums: ", asl)
         metric_result = 206.835 - (1.015 * asl) - (84.6 * asw)
-        return metric_result
+        return round(metric_result, 2)
     
     def flesch_reading_grade(self, flesch_reading_ease):
         grade_meaning = ""
@@ -119,7 +119,7 @@ class ComplexityEval:
 
     def gunning_fog_index(self, asl, cws):
         metric_result = 0.4 * ((asl) + cws * 100)
-        return metric_result
+        return round (metric_result, 2)
 
     def gunning_fog_grade(self, gunning_fog_grade):
         grade_meaning = ""
@@ -201,6 +201,12 @@ class ComplexityEval:
                     field_dict["Kārta"] = item.get("Kārta")
                 fields.append(field_dict)
         return fields
+    
+    def repeatingPatterns(self):
+        words = self.tokenize()
+        unique_words = set(words)
+        result = (len(unique_words) / len(words)) * 100
+        return round(result, 2)
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -259,6 +265,9 @@ class ComplexityEval:
         lvnlpanalysisData = self.LVNLPAnalysis(sentences)
         print("LV NLP analīze: ", lvnlpanalysisData)
 
+        uniqueness = self.repeatingPatterns()
+        print(uniqueness,"%")
+
         print("\n\n----------------Sintaktiskā analīze------------------------\n")
         
         parsedAnalysisData = json.loads(lvnlpanalysisData)
@@ -269,7 +278,18 @@ class ComplexityEval:
         print("Vidējo komatu skaits teikumā: ", avgCommas)
 
 def main():
-    text = '''Lielbritānijas uzņēmuma "British Steel" vadīts konsorcijs atkārtoti paudis vēlmi iegādāties visu maksātnespējīgās AS "KVV Liepājas metalurgs" mantu kopumā, liecina aģentūras LETA rīcībā esoša "British Steel" vēstule, vēstīja Marta Zariņa. Delfīnu balle. Tu jau zini cik jautri tas ir vne hehehe'''
+    text = '''
+    Likumu grozījumi izstrādāti, lai vienkāršotu pārkreditācijas procesu hipotekāro kredītu ņēmējiem. Valdība uzskata, ka, atvieglojot kredītņēmēju iespējas mainīt kredītiestādes, samazinot pārkreditācijas izmaksas un palielinot konkurenci starp kredīta devējiem, tiks attīstīti kredītiestāžu piedāvātie risinājumi hipotekāro kredītu ņēmējiem un mazinātas augstās hipotekāro kredītu likmes.
+
+    Lai sasniegtu šos mērķus, valdība atbalstīja grozījumus četros likumos – Patērētāju tiesību aizsardzības likumā,  Kredītiestāžu likumā, Notariāta likumā un Apdrošināšanas līguma likumā. Lai atvieglojumi stātos spēkā, grozījumi likumos vēl jāapstiprina Saeimai. 
+
+    Ekonomikas ministrs Viktors Valainis (Zaļo un Zemnieku savienība) norādīja, ka plānotie atvieglojumi patlaban mērķēti uz hipotekāro kredītu pārkreditēšanu, taču, grozījumus skatot Saeimā, varētu rosināt tos attiecināt arī uz citiem kredītiem. 
+
+    Latvijā ir viens no augstākajiem kredītu tirgus koncentrācijas rādītājiem eirozonā. Četru lielāko kredītiestāžu tirgus daļa uzņēmumu kredītu segmentā ir tuvu 80%, bet mājokļa kredītu segmentā tuvu 100%, teikts likumprojekta anotācijā.
+
+    Viens no konkurenci ierobežojošiem faktoriem ir samērā dārgs pārkreditēšanās process, teikts likumprojekta anotācijā. Bankas piemēro komisiju, ne tikai izsniedzot kredītu, bet arī brīdī, kad tiek īstenota pārkreditēšanās pie cita kredīta devēja. Tāpat izmaksas rada arī notāra un zemesgrāmatas pakalpojumi. 
+    
+    '''
     evaluator = ComplexityEval(text)
     evaluator.evaluate()
 
