@@ -66,12 +66,14 @@ class ComplexityEval:
         return syllablesList
 
     def ASW(self, syllables):
-        hyphen_counts = [syllable.count('-') + 1 for syllable in syllables]
+        hyphen_counts = [syllable.count('-') for syllable in syllables]
         print(hyphen_counts)
         asw = sum(hyphen_counts) / len(hyphen_counts) if len(hyphen_counts) > 0 else 0
         return asw
 
     def flesch_reading_ease(self, asl, asw):
+        print("Videji zilbes: ",asl)
+        print("Videji teikuma garums: ",asw)
         metric_result = 206.835 - (1.015 * asl) - (84.6 * asw)
         return metric_result
     
@@ -150,21 +152,23 @@ class ComplexityEval:
 
             sentence_results = []
             for sentence in sentences:
-                tags = {'cs': False, 'cc': False}
+                tags = {'cs': False, 'cc': False, 'zc': False}
                 for token in sentence.get('tokens', []):
                     if token['tag'] == 'cs':
                         tags['cs'] = True
                     if token['tag'] == 'cc':
                         tags['cc'] = True
+                    if token['tag'] == 'zc':
+                        tags['zc'] = True
                 
                 if tags['cs'] and tags['cc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts jaukts'})
                 elif tags['cs']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts pakārtots'})
-                elif tags['cc']:
+                elif tags['cc'] or tags['zc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts sakārtots'})
                 else:
-                    sentence_results.append({'teikums': text, 'uzbuve': 'Nevaru noteikt'})
+                    sentence_results.append({'teikums': text, 'uzbuve': 'Vienkāršs'})
             
             results[key] = sentence_results
         return json.dumps(results, indent=2, ensure_ascii=False)
@@ -177,24 +181,10 @@ class ComplexityEval:
             commaCount += sentence.count(',')
         if sentencesCount > 0:
             average = commaCount / sentencesCount
-            print(commaCount, sentencesCount)
             return average
         else:
             return 0
-        
-    def getWordAnalysis(self, words):
-        analysisList = []
-        for word in words:
-            url = f"http://api.tezaurs.lv:8182/analyze/{word}"
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = response.json()
-                if data:
-                    analysisList.append(data)
-                else:
-                    print("Nav atrasti dati vārdam:", word)
-            else:
-                return f"Error: {response.status_code}"
+
 
         fields = []
         for items in analysisList:
@@ -269,14 +259,6 @@ class ComplexityEval:
 
         sentences = self.tokenizeSent()
 
-        print("\n\n----------------Vārdu analīze------------------------\n")
-
-        analysedWords = self.getWordAnalysis(words)
-        formattedAnalysedWords = json.dumps(analysedWords, indent=4, ensure_ascii=False)
-        analysedWords = [dict(t) for t in set(tuple(d.items()) for d in analysedWords if isinstance(d, dict))]
-        formattedAnalysedWords = json.dumps(analysedWords, indent=4, ensure_ascii=False)
-        print("Vārdu analīze:", formattedAnalysedWords)
-
         print("\n\n----------------Morfoloģiskā analīze------------------------\n")
 
         lvnlpanalysisData = self.LVNLPAnalysis(sentences)
@@ -292,7 +274,7 @@ class ComplexityEval:
         print("Vidējo komatu skaits teikumā: ", avgCommas)
 
 def main():
-    text = '''Dzīvnieks lido, lai varētu dzīvot, bet nevis dzert. Lai šādu dzīvesstilu uzturētu vajag ūdeni. Es neesmu zaļš, bet nevajag mani apcelt. Viņš sacīja: "Nav jau man grūti to izdarīt, ja vien būtu palīgs"'''
+    text = '''Lielbritānijas uzņēmuma "British Steel" vadīts konsorcijs atkārtoti paudis vēlmi iegādāties visu maksātnespējīgās AS "KVV Liepājas metalurgs" mantu kopumā, liecina aģentūras LETA rīcībā esoša "British Steel" vēstule, vēstīja Marta Zariņa. Delfīnu balle. Tu jau zini cik jautri tas ir vne hehehe'''
     evaluator = ComplexityEval(text)
     evaluator.evaluate()
 
