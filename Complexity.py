@@ -195,6 +195,14 @@ class ComplexityEval:
                 fields.append(field_dict)
         return fields
     
+    def NERCounter(self, analysisList):
+        ner_count = 0
+        for teikums in analysisList.values():
+            for sentence in teikums['sentences']:
+                ner_count += len(sentence['ner'])
+
+        return ner_count
+    
     def repeatingPatterns(self):
         words = self.tokenize()
         unique_words = set(words)
@@ -257,16 +265,41 @@ class ComplexityEval:
         lvnlpanalysisData = self.LVNLPAnalysis(sentences)
         print("LV NLP analīze: ", lvnlpanalysisData)
 
+        parsedAnalysisData = json.loads(lvnlpanalysisData)
+
+        NERCount = self.NERCounter(parsedAnalysisData)
+        print("Nosaukto entitāšu daudzums tekstā: ", NERCount)
+
         uniqueness = self.repeatingPatterns()
         print('\n', "Teksts ir ",uniqueness,"% unikāls")
 
         print("\n\n----------------Sintaktiskā analīze------------------------\n")
         
-        parsedAnalysisData = json.loads(lvnlpanalysisData)
         sentenceType = self.sentence_type(parsedAnalysisData)
         print("Teikumu uzbūve: ", sentenceType)
 
         avgCommas = self.average_comma_count()
+        print("Vidējo komatu skaits teikumā: ", avgCommas)
+
+        print("\n\n----------------Kopā:------------------------\n")
+
+
+        print("Zilbju saraksts:\n", syllables, '\n')
+
+        print(f"Fleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
+
+        print(f"Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result, '\n')
+
+        print(f"Gunning fog indekss: ",gunning_fog_index_result)
+
+        print(f"Gunning fog klase: ", gunning_fog_index_grade)
+
+        print("Nosaukto entitāšu daudzums tekstā: ", NERCount)
+
+        print('\n', "Teksts ir ",uniqueness,"% unikāls")
+
+        print("Teikumu uzbūve: ", sentenceType)
+
         print("Vidējo komatu skaits teikumā: ", avgCommas)
 
 def main(fileName):
