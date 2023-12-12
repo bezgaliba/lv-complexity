@@ -208,6 +208,17 @@ class ComplexityEval:
         unique_words = set(words)
         result = (len(unique_words) / len(words)) * 100
         return round(result, 2)
+    
+    def directSpeech(self, analysisList):
+        count = 0
+        for teikums_key, teikums_value in analysisList.items():
+            sentences = teikums_value.get('sentences', [])
+            for sentence in sentences:
+                tokens = sentence.get('tokens', [])
+                for i in range(len(tokens) - 1):
+                    if tokens[i].get('lemma') == ':' and tokens[i + 1].get('lemma') == '"':
+                        count += 1
+        return count
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -280,27 +291,9 @@ class ComplexityEval:
 
         avgCommas = self.average_comma_count()
         print("Vidējo komatu skaits teikumā: ", avgCommas)
-
-        print("\n\n----------------Kopā:------------------------\n")
-
-
-        print("Zilbju saraksts:\n", syllables, '\n')
-
-        print(f"Fleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
-
-        print(f"Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result, '\n')
-
-        print(f"Gunning fog indekss: ",gunning_fog_index_result)
-
-        print(f"Gunning fog klase: ", gunning_fog_index_grade)
-
-        print("Nosaukto entitāšu daudzums tekstā: ", NERCount)
-
-        print('\n', "Teksts ir ",uniqueness,"% unikāls")
-
-        print("Teikumu uzbūve: ", sentenceType)
-
-        print("Vidējo komatu skaits teikumā: ", avgCommas)
+        
+        directSpeechCount = self.directSpeech(parsedAnalysisData)
+        print("Tiešo runu daudzums: ", directSpeechCount)
 
 def main(fileName):
     with open(fileName, 'r', encoding='utf-8') as file:
