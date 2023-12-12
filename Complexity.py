@@ -1,4 +1,5 @@
 import requests
+import argparse
 import json
 import re
 import nltk
@@ -257,7 +258,7 @@ class ComplexityEval:
         print("LV NLP analīze: ", lvnlpanalysisData)
 
         uniqueness = self.repeatingPatterns()
-        print(uniqueness,"%")
+        print('\n', "Teksts ir ",uniqueness,"% unikāls")
 
         print("\n\n----------------Sintaktiskā analīze------------------------\n")
         
@@ -268,21 +269,17 @@ class ComplexityEval:
         avgCommas = self.average_comma_count()
         print("Vidējo komatu skaits teikumā: ", avgCommas)
 
-def main():
-    text = '''
-    Likumu grozījumi izstrādāti, lai vienkāršotu pārkreditācijas procesu hipotekāro kredītu ņēmējiem. Valdība uzskata, ka, atvieglojot kredītņēmēju iespējas mainīt kredītiestādes, samazinot pārkreditācijas izmaksas un palielinot konkurenci starp kredīta devējiem, tiks attīstīti kredītiestāžu piedāvātie risinājumi hipotekāro kredītu ņēmējiem un mazinātas augstās hipotekāro kredītu likmes.
-
-    Lai sasniegtu šos mērķus, valdība atbalstīja grozījumus četros likumos – Patērētāju tiesību aizsardzības likumā,  Kredītiestāžu likumā, Notariāta likumā un Apdrošināšanas līguma likumā. Lai atvieglojumi stātos spēkā, grozījumi likumos vēl jāapstiprina Saeimai. 
-
-    Ekonomikas ministrs Viktors Valainis (Zaļo un Zemnieku savienība) norādīja, ka plānotie atvieglojumi patlaban mērķēti uz hipotekāro kredītu pārkreditēšanu, taču, grozījumus skatot Saeimā, varētu rosināt tos attiecināt arī uz citiem kredītiem. 
-
-    Latvijā ir viens no augstākajiem kredītu tirgus koncentrācijas rādītājiem eirozonā. Četru lielāko kredītiestāžu tirgus daļa uzņēmumu kredītu segmentā ir tuvu 80%, bet mājokļa kredītu segmentā tuvu 100%, teikts likumprojekta anotācijā.
-
-    Viens no konkurenci ierobežojošiem faktoriem ir samērā dārgs pārkreditēšanās process, teikts likumprojekta anotācijā. Bankas piemēro komisiju, ne tikai izsniedzot kredītu, bet arī brīdī, kad tiek īstenota pārkreditēšanās pie cita kredīta devēja. Tāpat izmaksas rada arī notāra un zemesgrāmatas pakalpojumi. 
+def main(fileName):
+    with open(fileName, 'r', encoding='utf-8') as file:
+        text = file.read()
+        if text:
+            evaluator = ComplexityEval(text)
+            evaluator.evaluate()
+        else:
+            print("Datnes saturs nesatur tekstu.") 
     
-    '''
-    evaluator = ComplexityEval(text)
-    evaluator.evaluate()
-
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Process text from a file')
+    parser.add_argument('-i', '--input', help='Input file name using -i', required=True)
+    args = parser.parse_args()
+    main(args.input)
