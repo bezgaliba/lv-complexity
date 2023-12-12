@@ -66,14 +66,14 @@ class ComplexityEval:
         return syllablesList
 
     def ASW(self, syllables):
-        hyphen_counts = [syllable.count('-') for syllable in syllables]
+        hyphen_counts = [syllable.count('-') + 1 for syllable in syllables]
         print(hyphen_counts)
         asw = sum(hyphen_counts) / len(hyphen_counts) if len(hyphen_counts) > 0 else 0
         return asw
 
     def flesch_reading_ease(self, asl, asw):
-        print("Videji zilbes: ",asl)
-        print("Videji teikuma garums: ",asw)
+        print("Vidēji zilbes: ", asw)
+        print("Videji teikuma garums: ", asl)
         metric_result = 206.835 - (1.015 * asl) - (84.6 * asw)
         return metric_result
     
@@ -103,8 +103,8 @@ class ComplexityEval:
     def complex_words(self, syllables):
         words_to_remove = []
         for word in syllables:
-            hyphen_count = word.count('-')
-            hyphen_count = hyphen_count + 1
+            hyphen_count = word.count('-') + 1
+            hyphen_count = hyphen_count
             if hyphen_count < 3:
                 words_to_remove.append(word)
 
@@ -251,11 +251,6 @@ class ComplexityEval:
         gunning_fog_index_grade = self.gunning_fog_grade(gunning_fog_index_result)
 
         print(f"Gunning fog klase: ", gunning_fog_index_grade)
-
-        print("\n\n----------------Teikuma uzbūve------------------------\n")
-
-        print(f"Vidējais zilbju daudzums vārdā (ASW): {asw}")
-        print(f"Vidējais teikuma garums (ASL): {asl_result}\n")
 
         sentences = self.tokenizeSent()
 
