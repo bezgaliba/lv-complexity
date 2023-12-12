@@ -24,20 +24,12 @@ class ComplexityEval:
         cleansed_sent = sent_tokenize(self.text)
         return cleansed_sent
 
-    # ASL jeb Average Sentence Length noskaidro, cik vidēji garš teikums ir.
-    # ASL metrika = Kopējais vārdu skaits starp visiem teikumiem / Kopējais teikumu skaits
     def ASL(self):
-        # Definē, kas ir teikums (Teksta vienība atdalīta ar beigu simbolu)
         sentences = re.split('[.!?]', self.text)
-        # Noņem empty string sentences (tikai, ja eksistē teikums)
         sentences = [sentence for sentence in sentences if sentence.strip()]
-        # Izveido sarakstu ar visiem vārdiem. Viens saraksta elements = viens vārds.
-        # Ar len() metodi noskaidro saraksta garumu.
         words = self.tokenize()
         word_count = len(words)
-        # Ar len() metodi noskaidro cik teikumi ir tekstā.
         sentences_count = len(sentences)
-        # Aprēķina vidējo garumu teikumam.
         asl = word_count / sentences_count
         return round(asl, 2)
 
@@ -248,7 +240,6 @@ class ComplexityEval:
         print(f"Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result, '\n')
 
         complex_words = self.complex_words(syllables)
-        # print(f"Sarežģītie vārdi: ", complex_words)
         cws_result = self.CWS(words, complex_words)
         gunning_fog_index_result = self.gunning_fog_index(asl_result, cws_result)
 
