@@ -73,23 +73,23 @@ class ComplexityEval:
     def flesch_reading_grade(self, flesch_reading_ease):
         grade_meaning = ""
         if flesch_reading_ease >= 90:
-            grade_meaning = "Very easy to read. Vecuma līmenis: 9 gadi un zemāk"
+            grade_meaning = "Ļoti viegli lasāms. Vecuma līmenis: Pirmsskolas +"
         elif flesch_reading_ease >= 80:
-            grade_meaning = "Easy to read. Vecuma līmenis: 9 gadi un zemāk"
+            grade_meaning = "Viegli lasāms. Vecuma līmenis: 9 gadi +"
         elif flesch_reading_ease >= 70:
-            grade_meaning = "Fairly easy to read. Vecuma līmenis: 10 gadi"
+            grade_meaning = "Diezgan viegli lasāms. Vecuma līmenis: 10 gadi +"
         elif flesch_reading_ease >= 60:
-            grade_meaning = "Plain English. Vecuma līmenis: 11 - 13 gadi"
+            grade_meaning = "Vienkārši lasāms. Vecuma līmenis: 11 gadi +"
         elif flesch_reading_ease >= 50:
-            grade_meaning = "Fairly difficult to read. Vecuma līmenis: 13-15 gadi"
+            grade_meaning = "Vidēji grūti lasāms. Vecuma līmenis: 13 gadi +"
         elif flesch_reading_ease >= 30:
-            grade_meaning = "Difficult to read. Līmenis: koledžas"
+            grade_meaning = "Grūti lasāms. Līmenis: koledžas, 18 gadi +"
         elif flesch_reading_ease >= 10:
-            grade_meaning = "Very difficult to read. Līmenis: koledžas absolvents"
+            grade_meaning = "Ļoti grūti lasāms. Līmenis: koledžas absolvents, 21 gadi +"
         elif flesch_reading_ease >= 0:
-            grade_meaning = "Extremely difficult to read. Līmenis: profesionāla"
+            grade_meaning = "Ārkārtīgi grūti lasāms. Līmenis: profesionāla, 23 gadi +"
         else:
-            grade_meaning = "Nesekmīgi"
+            grade_meaning = "Nevar noteikt. Samaziniet teikuma garumu."
 
         return grade_meaning
     
@@ -115,25 +115,25 @@ class ComplexityEval:
         return round (metric_result, 2)
 
     def gunning_fog_grade(self, gunning_fog_grade):
-        grade_meaning = ""
+        grade_meaning = "Līmenis: "
         if gunning_fog_grade >= 20:
-            grade_meaning = "Post-graduate +"
+            grade_meaning += "Universitātes"
         elif gunning_fog_grade >= 17:
-            grade_meaning = "Post-graduate"
+            grade_meaning += "Vidusskolas absolventa"
         elif gunning_fog_grade >= 16:
-            grade_meaning = "College senior"
+            grade_meaning += "12. klases"
         elif gunning_fog_grade >= 13:
-            grade_meaning = "College junior"
+            grade_meaning += "10. - 11. klases"
         elif gunning_fog_grade >= 11:
-            grade_meaning = "High school senior"
+            grade_meaning += "9. klases"
         elif gunning_fog_grade >= 10:
-            grade_meaning = "High school sophomore"
+            grade_meaning += "8. klases"
         elif gunning_fog_grade >= 9:
-            grade_meaning = "High school freshman"
+            grade_meaning += "5. - 7. klases"
         elif gunning_fog_grade < 9:
-            grade_meaning = "Middle school and below"
+            grade_meaning += "Sākumskolas un zem"
         else:
-            grade_meaning = "Nesekmīgi"
+            grade_meaning += "Nevar noteikt. Samaziniet teikuma garumu."
 
         return grade_meaning
 
@@ -154,11 +154,11 @@ class ComplexityEval:
                     if token['tag'] == 'zc':
                         tags['zc'] = True
                 
-                if tags['cs'] and tags['cc']:
+                if tags['cs'] and tags['cc'] and tags['zc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts jaukts'})
-                elif tags['cs']:
+                elif tags['cs'] and tags['zc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts pakārtots'})
-                elif tags['cc'] or tags['zc']:
+                elif tags['cc'] and tags['zc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts sakārtots'})
                 else:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Vienkāršs'})
@@ -174,26 +174,9 @@ class ComplexityEval:
             commaCount += sentence.count(',')
         if sentencesCount > 0:
             average = commaCount / sentencesCount
-            return average
+            return round(average, 2)
         else:
             return 0
-
-
-        fields = []
-        for items in analysisList:
-            for item in items:
-                field_dict = {
-                    "Vārds": item.get("Vārds"),
-                    "Mija": item.get("Mija"),
-                }
-                if "Izteiksme" in item:
-                    field_dict["Izteiksme"] = item.get("Izteiksme")
-                if "Pakāpe" in item:
-                    field_dict["Pakāpe"] = item.get("Pakāpe")
-                if "Kārta" in item:
-                    field_dict["Kārta"] = item.get("Kārta")
-                fields.append(field_dict)
-        return fields
     
     def NERCounter(self, analysisList):
         ner_count = 0
