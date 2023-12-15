@@ -5,6 +5,7 @@ import re
 import nltk
 import spacy
 from nltk.tokenize import sent_tokenize, word_tokenize
+from collections import OrderedDict
 requests.packages.urllib3.disable_warnings()
 
 
@@ -200,8 +201,13 @@ class ComplexityEval:
                         cleanLemma = symbolPattern.sub('', lemma)
                         if cleanLemma:
                             lemmas.append(cleanLemma)
-
-        return lemmas
+        
+        uniqueLemmas = list(OrderedDict.fromkeys(lemmas))
+        return uniqueLemmas
+    
+    def TypeTokenRatio(self, lemmaList, wordsList):
+        TTR_result = len(lemmaList) / len(wordsList)
+        return round(TTR_result, 2)
     
     def directSpeech(self, analysisList, sentencesTotal):
         directSpeechCount = 0
@@ -297,6 +303,10 @@ class ComplexityEval:
 
         lemmas = self.getLemma(parsedAnalysisData)
         print("Lemmas:", lemmas)
+        print("Words:", words)
+
+        TypeTokenRatio = self.TypeTokenRatio(lemmas, words)
+        print("Unikālo vārdu īpatsvars: ", TypeTokenRatio)
 
 def main(fileName):
     with open(fileName, 'r', encoding='utf-8') as file:
