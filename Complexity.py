@@ -156,9 +156,9 @@ class ComplexityEval:
                 
                 if tags['cs'] and tags['cc'] and tags['zc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts jaukts'})
-                elif tags['cs'] and tags['zc']:
+                elif tags['cs'] and tags['zc'] and not tags['cc']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts pakārtots'})
-                elif tags['cc'] and tags['zc']:
+                elif tags['cc'] and tags['zc'] and not tags['cs']:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Salikts sakārtots'})
                 else:
                     sentence_results.append({'teikums': text, 'uzbuve': 'Vienkāršs'})
@@ -186,22 +186,39 @@ class ComplexityEval:
 
         return ner_count
     
-    def repeatingPatterns(self):
-        words = self.tokenize()
-        unique_words = set(words)
-        result = (len(unique_words) / len(words)) * 100
-        return round(result, 2)
+    def getLemma(self, analysisList):
+        lemmas = []
+        symbolPattern = re.compile(r'[^\w\s]')
+
+        for teikums_key, teikums_value in analysisList.items():
+            sentences = teikums_value.get('sentences', [])
+            for sentence in sentences:
+                tokens = sentence.get('tokens', [])
+                for token in tokens:
+                    lemma = token.get('lemma')
+                    if lemma:
+                        cleanLemma = symbolPattern.sub('', lemma)
+                        if cleanLemma:
+                            lemmas.append(cleanLemma)
+
+        return lemmas
     
-    def directSpeech(self, analysisList):
-        count = 0
+    def directSpeech(self, analysisList, sentencesTotal):
+        directSpeechCount = 0
         for teikums_key, teikums_value in analysisList.items():
             sentences = teikums_value.get('sentences', [])
             for sentence in sentences:
                 tokens = sentence.get('tokens', [])
                 for i in range(len(tokens) - 1):
                     if tokens[i].get('lemma') == ':' and tokens[i + 1].get('lemma') == '"':
-                        count += 1
-        return count
+                        directSpeechCount += 1
+        
+        return round(directSpeechCount / len(sentencesTotal), 2)
+    
+    def simpleSentence(self, sentenceType, sentencesTotal):
+        data = json.loads(sentenceType)
+        simpleSentenceCount = sum(1 for teikums_list in data.values() for teikums_dict in teikums_list if teikums_dict.get('uzbuve') == 'Vienkāršs')
+        return round(simpleSentenceCount / len(sentencesTotal), 2)
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -264,9 +281,6 @@ class ComplexityEval:
         NERCount = self.NERCounter(parsedAnalysisData)
         print("Nosaukto entitāšu daudzums tekstā: ", NERCount)
 
-        uniqueness = self.repeatingPatterns()
-        print('\n', "Teksts ir ",uniqueness,"% unikāls")
-
         print("\n\n----------------Sintaktiskā analīze------------------------\n")
         
         sentenceType = self.sentence_type(parsedAnalysisData)
@@ -275,8 +289,14 @@ class ComplexityEval:
         avgCommas = self.average_comma_count()
         print("Vidējo komatu skaits teikumā: ", avgCommas)
         
-        directSpeechCount = self.directSpeech(parsedAnalysisData)
-        print("Tiešo runu daudzums: ", directSpeechCount)
+        directSpeechProportion = self.directSpeech(parsedAnalysisData, sentences)
+        print("Tiešo runu īpatsvars: ", directSpeechProportion)
+
+        simpleSentenceProportion = self.simpleSentence(sentenceType, sentences)
+        print("Vienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
+
+        lemmas = self.getLemma(parsedAnalysisData)
+        print("Lemmas:", lemmas)
 
 def main(fileName):
     with open(fileName, 'r', encoding='utf-8') as file:
