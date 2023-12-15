@@ -4,6 +4,8 @@ import json
 import re
 import nltk
 import spacy
+import pyfiglet
+import xml.etree.ElementTree as ET
 from nltk.tokenize import sent_tokenize, word_tokenize
 from collections import OrderedDict
 requests.packages.urllib3.disable_warnings()
@@ -61,13 +63,10 @@ class ComplexityEval:
 
     def ASW(self, syllables):
         hyphen_counts = [syllable.count('-') + 1 for syllable in syllables]
-        print(hyphen_counts)
         asw = sum(hyphen_counts) / len(hyphen_counts) if len(hyphen_counts) > 0 else 0
         return round(asw, 2)
 
     def flesch_reading_ease(self, asl, asw):
-        print("Vidēji zilbes: ", asw)
-        print("Videji teikuma garums: ", asl)
         metric_result = 206.835 - (1.015 * asl) - (84.6 * asw)
         return round(metric_result, 2)
     
@@ -179,13 +178,27 @@ class ComplexityEval:
         else:
             return 0
     
-    def NERCounter(self, analysisList):
-        ner_count = 0
+    def NERRatio(self, analysisList, words):
+        ner_count = {}
+        total_words = len(words)
+        total_ner = 0
+
         for teikums in analysisList.values():
             for sentence in teikums['sentences']:
-                ner_count += len(sentence['ner'])
+                for ner_entity in sentence['ner']:
+                    total_ner += 1
+                    entity_text = ner_entity['text']
+                    if entity_text in ner_count:
+                        ner_count[entity_text] += 1
+                    else:
+                        ner_count[entity_text] = 1
 
-        return ner_count
+        NERRatio = total_ner / total_words if total_words > 0 else 0
+
+        # Create JSON object with named entities and their counts
+        NERList = {entity: count for entity, count in ner_count.items()}
+
+        return NERRatio, json.dumps(NERList, indent=2, ensure_ascii=False)
     
     def getLemma(self, analysisList):
         lemmas = []
@@ -211,20 +224,50 @@ class ComplexityEval:
     
     def directSpeech(self, analysisList, sentencesTotal):
         directSpeechCount = 0
+        directSpeechExample = []
+
         for teikums_key, teikums_value in analysisList.items():
             sentences = teikums_value.get('sentences', [])
             for sentence in sentences:
                 tokens = sentence.get('tokens', [])
                 for i in range(len(tokens) - 1):
                     if tokens[i].get('lemma') == ':' and tokens[i + 1].get('lemma') == '"':
+                        directSpeechExample.append({
+                            'teksts': teikums_value.get('text'),
+                        })
                         directSpeechCount += 1
+
+        return round(directSpeechCount / len(sentencesTotal), 2), json.dumps(directSpeechExample, indent=2, ensure_ascii=False)
         
-        return round(directSpeechCount / len(sentencesTotal), 2)
-    
     def simpleSentence(self, sentenceType, sentencesTotal):
         data = json.loads(sentenceType)
         simpleSentenceCount = sum(1 for teikums_list in data.values() for teikums_dict in teikums_list if teikums_dict.get('uzbuve') == 'Vienkāršs')
         return round(simpleSentenceCount / len(sentencesTotal), 2)
+
+    def rarityClassification(self, lemmas, threshold=6000):
+        tree = ET.parse('LVK2022.xml')
+        root = tree.getroot()
+        word_frequencies = {}
+
+        for item in root.findall('./wordlist/item'):
+            token = item.find('str').text
+            frequency = int(item.find('freq').text)
+
+            if token in lemmas:
+                word_frequencies[token] = frequency
+
+        classifications = {}
+        for word in lemmas:
+            if word in word_frequencies:
+                frequency = word_frequencies[word]
+                if frequency < threshold:
+                    classifications[word] = 'RETS'
+                else:
+                    classifications[word] = 'nav rets'
+            else:
+                classifications[word] = '[= NAV ATRASTS =]'
+
+        return classifications
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -245,77 +288,82 @@ class ComplexityEval:
         return json.dumps(results, indent=2, ensure_ascii=False)
 
     def evaluate(self):
+        asl = self.ASL()
 
-        print("----------------TEKSTA SAREŽĢĪTĪBA------------------------\n\n")
-
-        print("----------------Lasāmības atribūtika------------------------\n")
-
-        asl_result = self.ASL()
-        
         words = self.tokenize()
 
         syllables = self.syllableize(words)
-        print("Zilbju saraksts:\n", syllables, '\n')
 
         asw = self.ASW(syllables)
 
-        flesch_reading_ease_result = self.flesch_reading_ease(asl_result, asw)
-        print(f"Fleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
-
+        flesch_reading_ease_result = self.flesch_reading_ease(asl, asw)
         flesch_reading_grade_result = self.flesch_reading_grade(flesch_reading_ease_result)
-        print(f"Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result, '\n')
 
         complex_words = self.complex_words(syllables)
         cws_result = self.CWS(words, complex_words)
-        gunning_fog_index_result = self.gunning_fog_index(asl_result, cws_result)
 
-        print(f"Gunning fog indekss: ",gunning_fog_index_result)
-
+        gunning_fog_index_result = self.gunning_fog_index(asl, cws_result)
         gunning_fog_index_grade = self.gunning_fog_grade(gunning_fog_index_result)
-
-        print(f"Gunning fog klase: ", gunning_fog_index_grade)
 
         sentences = self.tokenizeSent()
 
-        print("\n\n----------------Morfoloģiskā analīze------------------------\n")
-
         lvnlpanalysisData = self.LVNLPAnalysis(sentences)
-        print("LV NLP analīze: ", lvnlpanalysisData)
-
         parsedAnalysisData = json.loads(lvnlpanalysisData)
 
-        NERCount = self.NERCounter(parsedAnalysisData)
-        print("Nosaukto entitāšu daudzums tekstā: ", NERCount)
-
-        print("\n\n----------------Sintaktiskā analīze------------------------\n")
-        
+        NERRatio, NERExample = self.NERRatio(parsedAnalysisData, words)
+    
         sentenceType = self.sentence_type(parsedAnalysisData)
-        print("Teikumu uzbūve: ", sentenceType)
 
         avgCommas = self.average_comma_count()
-        print("Vidējo komatu skaits teikumā: ", avgCommas)
         
-        directSpeechProportion = self.directSpeech(parsedAnalysisData, sentences)
-        print("Tiešo runu īpatsvars: ", directSpeechProportion)
+        directSpeechProportion, directSpeechExamples = self.directSpeech(parsedAnalysisData, sentences)
 
         simpleSentenceProportion = self.simpleSentence(sentenceType, sentences)
-        print("Vienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
 
         lemmas = self.getLemma(parsedAnalysisData)
-        print("Lemmas:", lemmas)
-        print("Words:", words)
 
         TypeTokenRatio = self.TypeTokenRatio(lemmas, words)
-        print("Unikālo vārdu īpatsvars: ", TypeTokenRatio)
+
+        print("\n\n----------------KVANTITATĪVĀ ANALĪZE:------------------------\n")
+
+        
+        print("Vidējais teikuma garums: ", asl, " vārdi")
+        print("\nVidējais zilbju garums vārdā: ", asw)
+        print("Zilbju saraksts:\n", self.syllableize(words), '\n')
+        print("\nSarežģītie vārdi teikumā (3+ zilbes): ", complex_words)
+        print("\nVidējo komatu skaits teikumā: ", avgCommas)
+        print("\nFleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
+        print("\nFleša – Kinkeida lasīšanas viegluma klase: \n", flesch_reading_grade_result)
+        print("Gunning fog indekss: \n",gunning_fog_index_result)
+        print("\nGunning fog klase: ", gunning_fog_index_grade)
+
+        print("\n\n----------------KVALITATĪVĀ ANALĪZE:------------------------\n")
+        print("Nosauktās entitātes: ", NERExample)
+        print("Nosaukto entitāšu īpatsvars: ", NERRatio)
+        print("Tiešās runas: ", directSpeechExamples)
+        print("\nTiešo runu īpatsvars: ", directSpeechProportion)
+        print("Vienkāršie teikumi: ", sentenceType)
+        print("\nVienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
+        print("Visi uzskaitītie vārdi: ", words)
+        print("Unikālie vārdi: ", lemmas)
+        print("\nUnikālo vārdu īpatsvars: ", TypeTokenRatio)
+        
+        print("Reti sastopamie vārdi: ", )
+        rarityList = self. rarityClassification(lemmas)
+        for word, classification in rarityList.items():
+            print(f"'{word}' klasificēts kā '{classification}'")
 
 def main(fileName):
+    asciiArtContent = "Teksta Sarezgitiba"
+    asciiArt = pyfiglet.figlet_format(asciiArtContent)
+    print(asciiArt)
     with open(fileName, 'r', encoding='utf-8') as file:
         text = file.read()
         if text:
             evaluator = ComplexityEval(text)
             evaluator.evaluate()
         else:
-            print("Datnes saturs nesatur tekstu.") 
+            print("Datnes saturs nesatur tekstu.")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process text from a file')
