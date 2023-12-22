@@ -17,6 +17,7 @@ class ComplexityEval:
 
     def clean(self):
         cleansed_words = re.sub(r'[^\w\s]', '', self.text)
+        #print("Teksts pēc normalizācijas: ",cleansed_words,"\n")
         return cleansed_words
 
     def tokenize(self):
@@ -32,6 +33,7 @@ class ComplexityEval:
         sentences = re.split('[.!?]', self.text)
         sentences = [sentence for sentence in sentences if sentence.strip()]
         words = self.tokenize()
+        #print("Teksts pēc tokenizācijas: ",words,"\n\n")
         word_count = len(words)
         sentences_count = len(sentences)
         asl = word_count / sentences_count
@@ -45,11 +47,11 @@ class ComplexityEval:
         syllablesList = []
         response = session.get('https://www.ushuaia.pl/hyphen', verify=False)
         cookie = session.cookies.get_dict()
-        if response.status_code == 200:
-            if response:
-                print(f'Pieslēgts cookie auth: ', cookie['hyphen'])
-            else:
-                print(f"Cookie auth error: {response.status_code}")
+        # if response.status_code == 200:
+        #     if response:
+        #         print(f'Pieslēgts cookie auth: ', cookie['hyphen'])
+        #     else:
+        #         print(f"Cookie auth error: {response.status_code}")
         for word in wordList:
             url = f"https://www.ushuaia.pl/hyphen/hyphenate.php?word={word}&lang=lv_LV"
             response = requests.get(url, cookies=cookie, verify=False)
@@ -89,7 +91,7 @@ class ComplexityEval:
         elif flesch_reading_ease >= 0:
             grade_meaning = "Ārkārtīgi grūti lasāms. Līmenis: profesionāla, 23 gadi +"
         else:
-            grade_meaning = "Nevar noteikt. Samaziniet teikuma garumu."
+            grade_meaning = "Nevar noteikt. Mainiet teikuma parametrus kā garumu."
 
         return grade_meaning
     
@@ -133,7 +135,7 @@ class ComplexityEval:
         elif gunning_fog_grade < 9:
             grade_meaning += "Sākumskolas un zem"
         else:
-            grade_meaning += "Nevar noteikt. Samaziniet teikuma garumu."
+            grade_meaning += "Nevar noteikt. Mainiet teikuma parametrus kā garumu."
 
         return grade_meaning
 
@@ -195,7 +197,6 @@ class ComplexityEval:
 
         NERRatio = total_ner / total_words if total_words > 0 else 0
 
-        # Create JSON object with named entities and their counts
         NERList = {entity: count for entity, count in ner_count.items()}
 
         return NERRatio, json.dumps(NERList, indent=2, ensure_ascii=False)
@@ -268,6 +269,16 @@ class ComplexityEval:
                 classifications[word] = '[= NAV ATRASTS =]'
 
         return classifications
+    
+    def rarityRatio(self, rareList):
+        rareCount = sum(1 for value in rareList.values() if value == 'RETS')
+        notRareCount = len(rareList)
+
+        if notRareCount == 0:
+            return "Cannot divide by zero"
+
+        ratio = rareCount / notRareCount
+        return ratio
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -324,12 +335,16 @@ class ComplexityEval:
 
         TypeTokenRatio = self.TypeTokenRatio(lemmas, words)
 
-        print("\n\n----------------KVANTITATĪVĀ ANALĪZE:------------------------\n")
+        rarityList = self.rarityClassification(lemmas)
+        rarityProportion = self.rarityRatio(rarityList)
 
-        
+        print("\nDotais teksts: ",self.text,"\n")
+
+        print("\n\n----------------KVANTITATĪVĀ ANALĪZE:------------------------\n")
+    
         print("Vidējais teikuma garums: ", asl, " vārdi")
-        print("\nVidējais zilbju garums vārdā: ", asw)
-        print("Zilbju saraksts:\n", self.syllableize(words), '\n')
+        print("Vidējais zilbju garums vārdā: ", asw)
+        print("\nZilbju saraksts:\n", self.syllableize(words), '\n')
         print("\nSarežģītie vārdi teikumā (3+ zilbes): ", complex_words)
         print("\nVidējo komatu skaits teikumā: ", avgCommas)
         print("\nFleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
@@ -342,16 +357,18 @@ class ComplexityEval:
         print("Nosaukto entitāšu īpatsvars: ", NERRatio)
         print("Tiešās runas: ", directSpeechExamples)
         print("\nTiešo runu īpatsvars: ", directSpeechProportion)
-        print("Vienkāršie teikumi: ", sentenceType)
+        print("\nDotais teksts: ",self.text,"")
+        print("Teikumi pēc to uzbūves: ", sentenceType)
         print("\nVienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
         print("Visi uzskaitītie vārdi: ", words)
+        print("Morfoloģiskais tageris: ", lvnlpanalysisData)
         print("Unikālie vārdi: ", lemmas)
         print("\nUnikālo vārdu īpatsvars: ", TypeTokenRatio)
-        
-        print("Reti sastopamie vārdi: ", )
-        rarityList = self. rarityClassification(lemmas)
+        print("\nDotais teksts: ",self.text,"")
+        print("\nReti sastopamie vārdi: ", )
         for word, classification in rarityList.items():
             print(f"'{word}' klasificēts kā '{classification}'")
+        print("Reto vārdu īpatsvars: ", rarityProportion)
 
 def main(fileName):
     asciiArtContent = "Teksta Sarezgitiba"
