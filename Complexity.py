@@ -195,7 +195,7 @@ class ComplexityEval:
                     else:
                         ner_count[entity_text] = 1
 
-        NERRatio = total_ner / total_words if total_words > 0 else 0
+        NERRatio = round(total_ner / total_words if total_words > 0 else 0, 2)
 
         NERList = {entity: count for entity, count in ner_count.items()}
 
@@ -272,13 +272,9 @@ class ComplexityEval:
     
     def rarityRatio(self, rareList):
         rareCount = sum(1 for value in rareList.values() if value == 'RETS')
-        notRareCount = len(rareList)
-
-        if notRareCount == 0:
-            return "Cannot divide by zero"
-
-        ratio = rareCount / notRareCount
-        return ratio
+        foundLemmaCount = sum(1 for value in rareList.values() if value != '[= NAV ATRASTS =]')
+        ratio = rareCount / foundLemmaCount
+        return round(ratio, 2)
 
     def LVNLPAnalysis(self, sentencesSplit):
         api_url = 'https://nlp.ailab.lv/api/nlp'
@@ -353,15 +349,12 @@ class ComplexityEval:
         print("\nGunning fog klase: ", gunning_fog_index_grade)
 
         print("\n\n----------------KVALITATĪVĀ ANALĪZE:------------------------\n")
-        print("Nosauktās entitātes: ", NERExample)
-        print("Nosaukto entitāšu īpatsvars: ", NERRatio)
         print("Tiešās runas: ", directSpeechExamples)
         print("\nTiešo runu īpatsvars: ", directSpeechProportion)
-        print("\nDotais teksts: ",self.text,"")
         print("Teikumi pēc to uzbūves: ", sentenceType)
         print("\nVienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
         print("Visi uzskaitītie vārdi: ", words)
-        print("Morfoloģiskais tageris: ", lvnlpanalysisData)
+        #print("nlp-pipe tagotājs: ", lvnlpanalysisData)
         print("Unikālie vārdi: ", lemmas)
         print("\nUnikālo vārdu īpatsvars: ", TypeTokenRatio)
         print("\nDotais teksts: ",self.text,"")
@@ -369,6 +362,10 @@ class ComplexityEval:
         for word, classification in rarityList.items():
             print(f"'{word}' klasificēts kā '{classification}'")
         print("Reto vārdu īpatsvars: ", rarityProportion)
+
+        print("\n\n----------------LASĪTĀJU PIEREDZE UN ZINĀŠANAS:------------------------\n")
+        print("Nosauktās entitātes: ", NERExample)
+        print("Nosaukto entitāšu īpatsvars: ", NERRatio)
 
 def main(fileName):
     asciiArtContent = "Teksta Sarezgitiba"
