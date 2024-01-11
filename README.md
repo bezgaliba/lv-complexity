@@ -1,7 +1,13 @@
-# lv-word-complexity
- Kursa/bakalaura darba ietvaros apskatīts NLP uzdevums - teksta sarežģītības noteikšana.
+# lv-complexity
+ Kursa darba ietvaros apskatīts NLP uzdevums - teksta sarežģītības noteikšana klāt ar šī sākotnējā rīka izveidi.
 
 Teksta sarežģītības noteikšana ir dabiskās valodas apstrādes nozares uzdevums, kas nosaka  rakstiska teksta leksisko, sintaktisko struktūru, lasāmības un uztveras grūtības pakāpi, ņemot vērā atdalot to trijās galvenās raksturojošās komponentes – tekstu raksturojošos kvantitatīvos rādītājus, teksta kvalitāti un lasītāja pieredzi un zināšanas.
+
+# Darbināšana
+
+Nepiciešams Python, pieejams: https://www.python.org/downloads/
+CL interpretorā palaist komandu `pip install requests/nltk/spacy/pyfiglet`
+Norādiet direktoriju, kur stāv lv-complexity direktorija un darbiniet programmu `python lv-complexity -t TEXT_FILE.txt`, kur TEXT_FILE.txt ir jūsu pakļavīgs teksta fails ar tekstu saturu, kuru vēlaties izanalizēt. 
 
 # Paldies šiem autoriem par izmantotajiem rīkiem:
 
