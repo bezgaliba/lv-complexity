@@ -16,7 +16,7 @@ class ComplexityEval:
         self.text = text
 
     def clean(self):
-        cleansed_words = re.sub(r'[^\w\s]', '', self.text)
+        cleansed_words = re.sub(r'[^\w\s]', '', self.text).lower()
         #print("Teksts pēc normalizācijas: ",cleansed_words,"\n")
         return cleansed_words
 
@@ -38,7 +38,41 @@ class ComplexityEval:
         sentences_count = len(sentences)
         asl = word_count / sentences_count
         return round(asl, 2)
+    
+    def longWords(self):
+        words_list = self.tokenize()
+        count_long_words = 0
+        for word in words_list:
+            if len(word) > 6:
+                count_long_words += 1        
+        return count_long_words
+    
+    def GVD(self, longwordCount):
+        word_count =  len(self.tokenize())
+        metric_result = (longwordCount / word_count) * 100
+        return round(metric_result, 2)
 
+    def lvLasamibasMeginajums(self, longWords):
+        metric_result = self.GVD(longWords) + self.ASL()
+        return round(metric_result, 0)
+    
+    def lvLasamibas_grade(self, lvLasamibaKoeficients):
+        grade_meaning = "Lasāmības pakāpe: "
+        if lvLasamibaKoeficients > 54:
+            grade_meaning += "Ļoti grūts"
+        elif lvLasamibaKoeficients >= 45:
+            grade_meaning += "Grūts"
+        elif lvLasamibaKoeficients >= 35:
+            grade_meaning += "Vidēji grūts"
+        elif lvLasamibaKoeficients >= 25:
+            grade_meaning += "Viegls"
+        elif lvLasamibaKoeficients > 0 and lvLasamibaKoeficients < 24:
+            grade_meaning += "Ļoti viegls"
+        else:
+            grade_meaning += "Nevar noteikt. Lūdzu rediģējiet teikuma atribūtus, piemēram, garumu."
+
+        return grade_meaning
+    
     def replace_hyphens(self, data):
         return data.replace('<span class="hyphen">•</span>', '-')
 
@@ -47,11 +81,6 @@ class ComplexityEval:
         syllablesList = []
         response = session.get('https://www.ushuaia.pl/hyphen', verify=False)
         cookie = session.cookies.get_dict()
-        # if response.status_code == 200:
-        #     if response:
-        #         print(f'Pieslēgts cookie auth: ', cookie['hyphen'])
-        #     else:
-        #         print(f"Cookie auth error: {response.status_code}")
         for word in wordList:
             url = f"https://www.ushuaia.pl/hyphen/hyphenate.php?word={word}&lang=lv_LV"
             response = requests.get(url, cookies=cookie, verify=False)
@@ -303,6 +332,11 @@ class ComplexityEval:
 
         asw = self.ASW(syllables)
 
+        longWords = self.longWords()
+
+        lvLasamiba = self.lvLasamibasMeginajums(longWords)
+        lvLasamiba_result = self.lvLasamibas_grade(lvLasamiba)
+
         flesch_reading_ease_result = self.flesch_reading_ease(asl, asw)
         flesch_reading_grade_result = self.flesch_reading_grade(flesch_reading_ease_result)
 
@@ -339,14 +373,17 @@ class ComplexityEval:
         print("\n\n----------------KVANTITATĪVĀ ANALĪZE:------------------------\n")
     
         print("Vidējais teikuma garums: ", asl, " vārdi")
+        print("Vidējais vārda garums: ", longWords, " burti")
         print("Vidējais zilbju garums vārdā: ", asw)
         print("\nZilbju saraksts:\n", self.syllableize(words), '\n')
         print("\nSarežģītie vārdi teikumā (3+ zilbes): ", complex_words)
         print("\nVidējo komatu skaits teikumā: ", avgCommas)
+        print("\nLatviesu valodas meginajuma aprēķins: ", lvLasamiba)
+        print("Latviesu valodas meginajuma klase: ", lvLasamiba_result)
         print("\nFleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
-        print("\nFleša – Kinkeida lasīšanas viegluma klase: \n", flesch_reading_grade_result)
-        print("Gunning fog indekss: \n",gunning_fog_index_result)
-        print("\nGunning fog klase: ", gunning_fog_index_grade)
+        print("Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result)
+        print("\nGunning fog indekss: ",gunning_fog_index_result)
+        print("Gunning fog klase: ", gunning_fog_index_grade)
 
         print("\n\n----------------KVALITATĪVĀ ANALĪZE:------------------------\n")
         print("Tiešās runas: ", directSpeechExamples)
