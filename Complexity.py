@@ -33,7 +33,7 @@ class ComplexityEval:
         sentences = re.split('[.!?]', self.text)
         sentences = [sentence for sentence in sentences if sentence.strip()]
         words = self.tokenize()
-        #print("Teksts pēc tokenizācijas: ",words,"\n\n")
+        #print("Teksts pēc sadalīšana tekstvienībās: ",words,"\n\n")
         word_count = len(words)
         sentences_count = len(sentences)
         asl = word_count / sentences_count
@@ -69,7 +69,7 @@ class ComplexityEval:
         elif lvLasamibaKoeficients > 0 and lvLasamibaKoeficients < 24:
             grade_meaning += "Ļoti viegls"
         else:
-            grade_meaning += "Nevar noteikt. Lūdzu rediģējiet teikuma atribūtus, piemēram, garumu."
+            grade_meaning += "Nevar noteikt."
 
         return grade_meaning
     
@@ -120,7 +120,7 @@ class ComplexityEval:
         elif flesch_reading_ease >= 0:
             grade_meaning = "Ārkārtīgi grūti lasāms. Līmenis: profesionāla, 23 gadi +"
         else:
-            grade_meaning = "Nevar noteikt. Mainiet teikuma parametrus kā garumu."
+            grade_meaning = "Nevar noteikt."
 
         return grade_meaning
     
@@ -164,7 +164,7 @@ class ComplexityEval:
         elif gunning_fog_grade < 9:
             grade_meaning += "Sākumskolas un zem"
         else:
-            grade_meaning += "Nevar noteikt. Mainiet teikuma parametrus kā garumu."
+            grade_meaning += "Nevar noteikt."
 
         return grade_meaning
 
@@ -295,13 +295,13 @@ class ComplexityEval:
                 else:
                     classifications[word] = 'nav rets'
             else:
-                classifications[word] = '[= NAV ATRASTS =]'
+                classifications[word] = 'RETS'
 
         return classifications
     
     def rarityRatio(self, rareList):
         rareCount = sum(1 for value in rareList.values() if value == 'RETS')
-        foundLemmaCount = sum(1 for value in rareList.values() if value != '[= NAV ATRASTS =]')
+        foundLemmaCount = sum(1 for value in rareList.values())
         ratio = rareCount / foundLemmaCount
         return round(ratio, 2)
 
