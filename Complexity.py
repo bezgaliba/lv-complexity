@@ -394,7 +394,6 @@ class ComplexityEval:
         #print("nlp-pipe tagotājs: ", lvnlpanalysisData)
         print("Unikālie vārdi: ", lemmas)
         print("\nUnikālo vārdu īpatsvars: ", TypeTokenRatio)
-        print("\nDotais teksts: ",self.text,"")
         print("\nReti sastopamie vārdi: ", )
         for word, classification in rarityList.items():
             print(f"'{word}' klasificēts kā '{classification}'")
