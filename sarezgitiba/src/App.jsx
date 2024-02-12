@@ -5,7 +5,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <p>
-          sarezgitiba to be done 
+          sarezgitiba to be done. new deployment 12/02
         </p>
       </header>
     </div>
