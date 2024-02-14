@@ -1,72 +1,136 @@
-.parent {
+body{
+  font-family: 'Montserrat', sans-serif!important;
+  font-weight: 300;
+  font-size: 14px;
+  background-color: red;
+}
+
+.wrapper .left{
+  background-color: red;
+}
+
+.wrapper .right{
+  background-color: black;
+}
+
+.bottom{
+  background-color: rgb(51, 26, 83);
+}
+
+h1{
+  padding-bottom: 0.2em;
+}
+
+.wrapper .left,
+.wrapper .right{
+  width: 100%;
+  height: 45vh;
+  position: relative;
   display: flex;
-  font-family: arial, sans-serif;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.item {
-  width: 50%;
-  padding: 2em;
-  color: #ffffff;
-  background: #eeeeee;
-  min-height: 500px;
+.bottom{
+  width: 100%;
+  height: 10vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.last {
-  color: #222;
-  background: #ccc;
+.wrapper .image{
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-@media screen and (max-width: 600px){
-  
-  .parent {
-    flex-direction: column-reverse;  
-  }
-  
-  .item {
-    width: auto;
-    min-height: 200px;
-  }
-  
-  .last {
-    background: #aa0000;
-  }
-  
+.wrapperBottom .image{
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
-.App {
+
+.manual{
+  background: url('../public/resources/manual.jpg')
+}
+
+.ml{
+  background: url('../public/resources/ml.png')
+}
+
+.bg{
+  background: url('../public/resources/bg.jpg')
+}
+
+.caption{
+  position: relative;
+  z-index: 10;
+  color: white;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.caption h1{
+  text-transform: uppercase;
+  letter-spacing: 0.15em
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.caption .button{
+  background: black;
   color: white;
+  padding: 1em 2em;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.App-link {
-  color: #61dafb;
+.wrapper .side::before{
+  background: rgba(0,0,0,0.5);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  content:'';
+  display:block
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.wrapper .left:hover .image,
+.wrapper .right:hover .image{
+  transform: scale(1.2);
+  transition: 0.4s ease all;
+}
+
+.button:hover{
+  background: rgba(247, 255, 139, 0.808);
+  transition: 0.5s ease all;
+}
+
+@media screen and (min-width: 1200px) {
+  .wrapper{
+    display: flex;
   }
-  to {
-    transform: rotate(360deg);
+
+  .wrapper .left,
+  .wrapper .right{
+    width: 50%;
+    height: 90vh;
+  }
+  .bottom{
+    width: 100%;
+    height: 10vh;
   }
 }

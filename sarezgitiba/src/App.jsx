@@ -3,17 +3,31 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-  <div class="parent">
-  
-  <div class="item" style={{background: 'url(https://unsplash.it/800/300) center center no-repeat', backgroundSize: 'cover'}}></div>
-    
-    <div class="item last">
-      <h2>Flexbox - Split Screen Layout</h2>
-      <p>Example of a split screen layout that uses flexbox.</p>
-      <p>A media query is used to detect if the virewport is below 600px, if it is then <b>flex-direction</b> is set to column-reverse, so that the image is displayed after the copy, useful on mobile devices!.</p>
-      <p>Reduce the window size to below 600px to see an example.</p>
+  <div>
+    <div className="wrapper">
+        <div className="side left">
+          <div className='side image manual'></div>
+          <div className='caption'>
+            <h1>Manuālā</h1>
+            <a href='#' className='button'>Nosaki sarežģītību</a>
+          </div>
+      </div>
+        <div className="side right">
+          <div className='side image ml'></div>
+          <div className='caption'>
+            <h1>Mašīnmācīšanas</h1>
+            <a href='#' className='button'>Nosaki sarežģītību</a>
+          </div>
+      </div>
     </div>
-    
+      <div className='wrapperBottom'>
+      <div className="side bottom">
+        <div className='side image bg'></div>
+        <div className='caption'>
+          <a href='#' className='button'>Biežāk uzdotie jautājumi</a>
+          </div>
+          </div>
+    </div>
   </div>
   );
 }
