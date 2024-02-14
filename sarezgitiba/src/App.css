@@ -3,6 +3,7 @@ body{
   font-weight: 300;
   font-size: 14px;
   background-color: red;
+  overflow: hidden;
 }
 
 .wrapper .left{
@@ -32,6 +33,14 @@ h1{
   overflow: hidden;
 }
 
+.bottomWrapper .bottom{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
 .bottom{
   width: 100%;
   height: 10vh;
@@ -41,7 +50,8 @@ h1{
   justify-content: center;
 }
 
-.wrapper .image{
+.wrapper .image,
+.wrapperBottom .image{
   width: 100%;
   height: 100%;
   background-size: cover;
@@ -96,7 +106,8 @@ h1{
   letter-spacing: 0.05em;
 }
 
-.wrapper .side::before{
+.wrapper .side::before,
+.wrapperBottom .side::before{
   background: rgba(0,0,0,0.5);
   width: 100%;
   height: 100%;
@@ -109,7 +120,8 @@ h1{
 }
 
 .wrapper .left:hover .image,
-.wrapper .right:hover .image{
+.wrapper .right:hover .image,
+.wrapperBottom:hover .image{
   transform: scale(1.2);
   transition: 0.4s ease all;
 }

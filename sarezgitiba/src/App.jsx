@@ -9,14 +9,14 @@ function App() {
           <div className='side image manual'></div>
           <div className='caption'>
             <h1>Manuālā</h1>
-            <a href='#' className='button'>Nosaki sarežģītību</a>
+            <a href='#' className='button'>Nosaki teksta sarežģītību</a>
           </div>
       </div>
         <div className="side right">
           <div className='side image ml'></div>
           <div className='caption'>
             <h1>Mašīnmācīšanas</h1>
-            <a href='#' className='button'>Nosaki sarežģītību</a>
+            <a href='#' className='button'>Nosaki teksta sarežģītību</a>
           </div>
       </div>
     </div>
@@ -24,7 +24,7 @@ function App() {
       <div className="side bottom">
         <div className='side image bg'></div>
         <div className='caption'>
-          <a href='#' className='button'>Biežāk uzdotie jautājumi</a>
+          <a href='#' className='button'>Biežāk uzdotie jautājumi & apraksts</a>
           </div>
           </div>
     </div>
