@@ -1,34 +1,56 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Manual from './manual.jsx';
+import ML from './ml.jsx';
+import FAQ from './faq.jsx';
+import NotFound from './notfound.jsx';
+
+import { Link } from "react-router-dom";
+
+function Home() {
+  return (
+      <div>
+        <div className="wrapper">
+          <div className="side left">
+            <div className='side image manual'></div>
+            <div className='caption'>
+              <h1>Manuālā</h1>
+              <Link to="/manual" className='button'>Nosaki teksta sarežģītību</Link>
+            </div>
+          </div>
+          <div className="side right">
+            <div className='side image ml'></div>
+            <div className='caption'>
+              <h1>Mašīnmācīšanas</h1>
+              <Link to="/ml" className='button'>Nosaki teksta sarežģītību</Link>
+            </div>
+          </div>
+        </div>
+        <div className='wrapperBottom'>
+          <div className="side bottom">
+            <div className='side image bg'></div>
+            <div className='caption'>
+              <Link to="/faq" className='button'>Biežāk uzdotie jautājumi & apraksts</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+  );
+}
 
 function App() {
   return (
-  <div>
-    <div className="wrapper">
-        <div className="side left">
-          <div className='side image manual'></div>
-          <div className='caption'>
-            <h1>Manuālā</h1>
-            <a href='#' className='button'>Nosaki teksta sarežģītību</a>
-          </div>
-      </div>
-        <div className="side right">
-          <div className='side image ml'></div>
-          <div className='caption'>
-            <h1>Mašīnmācīšanas</h1>
-            <a href='#' className='button'>Nosaki teksta sarežģītību</a>
-          </div>
-      </div>
-    </div>
-      <div className='wrapperBottom'>
-      <div className="side bottom">
-        <div className='side image bg'></div>
-        <div className='caption'>
-          <a href='#' className='button'>Biežāk uzdotie jautājumi & apraksts</a>
-          </div>
-          </div>
-    </div>
-  </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/manual" element={<Manual />} />
+        <Route path="/ml" element={<ML />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
