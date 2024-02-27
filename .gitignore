@@ -6,3 +6,5 @@ LVK2022.xml
 api.py
 env
 .env
+__pycache__/
+*.py[cod]
