@@ -3,3 +3,6 @@ test.py
 LVK2022.xml
 *node_modules
 *build
+api.py
+env
+.env

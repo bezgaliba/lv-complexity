@@ -3,11 +3,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function NotFound() {
   return (
-  <div>
-    <div className='image'></div>
-    <div className='caption'>
+  <div class="container">
+    <div className='notimage'></div>
+    <div className='notcaption'>
       <h1>401: Neeksistē</h1>
-      <h1>401: Šī lapa nav pieejama. Atgriezieties atpakaļ</h1>
+      <h1>Šī lapa nav pieejama. Atgriezieties atpakaļ</h1>
     </div>
   </div>
   );

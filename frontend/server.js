@@ -1,14 +1,21 @@
-// back end
-
 const express = require('express');
 const path = require('path');
 const app = express();
+
+// Middleware to enable CORS
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 // connection to front end
 app.use(express.static(path.join(__dirname, 'build')));
 
 // API endpoint
-app.get('/api/sarezgitiba/:id', (req, res) => {
+app.get('/api/decapri/:id', (req, res) => {
     const id = req.params.id;
     const sarezgitiba = getSarezgitiba(id);
     if (!sarezgitiba) {
@@ -32,7 +39,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
