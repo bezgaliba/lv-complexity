@@ -382,42 +382,8 @@ class ComplexityEval:
         rarityList = self.rarityClassification(lemmas)
         rarityProportion = self.rarityRatio(rarityList)
 
-        # print("\nDotais teksts: ",self.text,"\n")
-
-        # print("\n\n----------------KVANTITATĪVĀ ANALĪZE:------------------------\n")
-    
-        # print("Vidējais teikuma garums: ", asl, " vārdi")
-        # print("Vidējais vārda garums: ", longWords, " burti")
-        # print("Vidējais zilbju garums vārdā: ", asw)
-        # print("\nZilbju saraksts:\n", self.syllableize(words), '\n')
-        # print("\nSarežģītie vārdi teikumā (3+ zilbes): ", complex_words)
-        # print("\nVidējo komatu skaits teikumā: ", avgCommas)
-        # print("\nLatviesu valodas meginajuma aprēķins: ", lvLasamiba)
-        # print("Latviesu valodas meginajuma klase: ", lvLasamiba_result)
-        # print("\nFleša lasīšanas viegluma aprēķins: ", flesch_reading_ease_result)
-        # print("Fleša – Kinkeida lasīšanas viegluma klase: ", flesch_reading_grade_result)
-        # print("\nGunning fog indekss: ",gunning_fog_index_result)
-        # print("Gunning fog klase: ", gunning_fog_index_grade)
-
-        # print("\n\n----------------KVALITATĪVĀ ANALĪZE:------------------------\n")
-        # print("Tiešās runas: ", directSpeechExamples)
-        # print("\nTiešo runu īpatsvars: ", directSpeechProportion)
-        # print("Teikumi pēc to uzbūves: ", sentenceType)
-        # print("\nVienkāršo teikumu īpatsvars: ", simpleSentenceProportion)
-        # print("Visi uzskaitītie vārdi: ", words)
-        # #print("nlp-pipe tagotājs: ", lvnlpanalysisData)
-        # print("Unikālie vārdi: ", lemmas)
-        # print("\nUnikālo vārdu īpatsvars: ", TypeTokenRatio)
-        # print("\nReti sastopamie vārdi: ", )
-        # for word, classification in rarityList.items():
-        #     print(f"'{word}' klasificēts kā '{classification}'")
-        # print("Reto vārdu īpatsvars: ", rarityProportion)
-
-        # print("\n\n----------------LASĪTĀJU PIEREDZE UN ZINĀŠANAS:------------------------\n")
-        # print("Nosauktās entitātes: ", NERExample)
-        # print("Nosaukto entitāšu īpatsvars: ", NERRatio)
-
         response = {
+            "teksts" : self.text,
             "vid_teikuma_gar": asl,
             "vid_varda_gar": longWords,
             "vid_zilbju_gar": asw,
