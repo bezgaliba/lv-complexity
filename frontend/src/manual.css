@@ -3,6 +3,7 @@
     align-items: center;
     justify-content: center;
     height: 100vh;
+    background-color: red;
   }
   
   .spinner {
@@ -96,8 +97,25 @@
   transition: background-color 0.3s ease;
 }
 
-.back{
-    background-color: #0c0d33;
+.back {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #0c0d33;
+}
+
+.tab-content p {
+  text-align: left;
+  padding: 10px; /* Adjust the padding as needed */
+  border-radius: 10px; /* Adjust the border-radius to make it more round */
+}
+
+.tab-content p:nth-child(odd) {
+  background-color: #f8d1d1e6;
+}
+
+.tab-content p:nth-child(even) {
+  background-color: hsl(0, 62%, 84%);
 }
 
 .button:hover {
@@ -145,23 +163,16 @@
   list-style: none;
 }
 
-.rougeScoresContainer {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  justify-content: center;
+.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+  width: 100%;
+  color: rgba(194, 35, 35, 0.902);
 }
 
-.rougeScore {
-  font-family: 'Source Sans Pro', sans-serif;
-  font-size: 14px;
+.zilbes {
+  list-style: none;
+  font-family: Source Sans Pro;
 }
 
-.rougeScore ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.rougeScoreValue {
-  font-weight: bold;
+.red-text {
+  color: red;
 }
