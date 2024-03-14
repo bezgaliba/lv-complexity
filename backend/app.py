@@ -404,17 +404,12 @@ class ComplexityEval:
             "unikalie_vardi": lemmas,
             "unikalo_vardu_svars": TypeTokenRatio,
             "reto_vardu_svars": rarityProportion,
+            "reto_vardu_saraksts": rarityList,
             "nosauktas_entitates": NERExample,
             "nosauktas_entitates_svars": NERRatio
         }
 
         return response
-
-def main():
-    asciiArtContent = "Teksta Sarezgitiba"
-    asciiArt = pyfiglet.figlet_format(asciiArtContent)
-    print(asciiArt)
-    
 
 @app.route("/favicon.ico")
 def favicon():
@@ -433,7 +428,7 @@ def submit():
     return response
 
 if __name__ == "__main__":
-    main()
     app.run(port=8080)
+    print('hi')
     
 
