@@ -15,7 +15,7 @@ function Home() {
           <div className="side left">
             <div className='side image manual'></div>
             <div className='caption'>
-              <h1>Manuālā</h1>
+              <h1>Statistika</h1>
               <Link to="/manual" className='button'>Nosaki teksta sarežģītību</Link>
             </div>
           </div>

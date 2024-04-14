@@ -49,7 +49,7 @@ function Manual() {
         </div>
         <Link to="/" className='button back'>Atpakaļ!</Link>
       </div>
-      <h1 className="headerOverlap">Manuālā teikuma sarežģītība</h1>
+      <h1 className="headerOverlap">Teksta statistikas sarežģītība</h1>
   
       <div className="split right">
         <div className="centered">
