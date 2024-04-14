@@ -23,9 +23,7 @@ CORS(app)
 
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG')
 
-directory = os.path.dirname(__file__)
-model_path = os.path.join(directory, "../../best_model.pkl")
-best_model = joblib.load(model_path)
+best_model = joblib.load("best_model.pkl")
 
 
 class ComplexityEval:
@@ -441,10 +439,12 @@ def predict():
 
     prediction_serializable = [x.item() if isinstance(x, np.int64) else x for x in prediction]
     
-    return jsonify({'prediction': prediction_serializable[0]})
+    response = jsonify({'text': text, 'prediction': prediction_serializable[0]})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    app.run(host="0.0.0.0", port=8080)
     
 
