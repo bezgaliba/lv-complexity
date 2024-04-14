@@ -4,7 +4,6 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Manual from './manual.jsx';
 import ML from './ml.jsx';
-import FAQ from './faq.jsx';
 import NotFound from './notfound.jsx';
 
 import { Link } from "react-router-dom";
@@ -32,7 +31,7 @@ function Home() {
           <div className="side bottom">
             <div className='side image bg'></div>
             <div className='caption'>
-              <Link to="/faq" className='button'>Biežāk uzdotie jautājumi & apraksts</Link>
+              <a href="https://github.com/bezgaliba/lv-complexity" className='button'>Biežāk uzdotie jautājumi & apraksts</a>
             </div>
           </div>
         </div>
@@ -47,7 +46,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/manual" element={<Manual />} />
         <Route path="/ml" element={<ML />} />
-        <Route path="/faq" element={<FAQ />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
