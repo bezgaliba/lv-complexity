@@ -3,12 +3,11 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import requests
-import argparse
 import json
 import re
 import nltk
-import spacy
-import pyfiglet
+import joblib
+import numpy as np
 import xml.etree.ElementTree as ET
 from nltk.tokenize import sent_tokenize, word_tokenize
 from collections import OrderedDict
@@ -23,6 +22,10 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG')
+
+directory = os.path.dirname(__file__)
+model_path = os.path.join(directory, "../../best_model.pkl")
+best_model = joblib.load(model_path)
 
 
 class ComplexityEval:
@@ -415,7 +418,7 @@ class ComplexityEval:
 def favicon():
     return url_for('static', filename='data:,')
 
-@app.route('/', methods=['GET'])
+@app.route('/statistics', methods=['GET'])
 def submit():
     text = request.args.get('text')
     if text is None:
@@ -427,8 +430,21 @@ def submit():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route('/untrained_predict', methods=['GET'])
+def predict():
+
+    text = request.args.get('text')
+    if text is None:
+        return "Datnes saturs nesatur tekstu."
+    
+    prediction = best_model.predict([text])
+
+    prediction_serializable = [x.item() if isinstance(x, np.int64) else x for x in prediction]
+    
+    return jsonify({'prediction': prediction_serializable[0]})
+
+
 if __name__ == "__main__":
     app.run(port=8080)
-    print('hi')
     
 
