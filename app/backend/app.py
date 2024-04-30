@@ -328,14 +328,18 @@ class ComplexityEval:
 
         for i, sentence in enumerate(sentencesSplit, start=1):
             payload = {'data': {'text': sentence}, 'steps': steps}
-            r = requests.post(api_url, json=payload)
-            
-            if r.status_code == 200:
-                data = r.json().get('data')
-                results[f"Teikums #{i}"] = data
-            else:
-                results[f"Teikums #{i}"] = f"Error: {r.status_code}"
-        
+            try:
+                r = requests.post(api_url, json=payload, verify=False)
+                r.raise_for_status()
+
+                if r.status_code == 200:
+                    data = r.json().get('data')
+                    results[f"Teikums #{i}"] = data
+                else:
+                    results[f"Teikums #{i}"] = f"Error: {r.status_code}"
+            except requests.exceptions.RequestException as e:
+                results[f"Teikums #{i}"] = f"Error: {str(e)}"
+
         return json.dumps(results, indent=2, ensure_ascii=False)
 
     def evaluate(self):
