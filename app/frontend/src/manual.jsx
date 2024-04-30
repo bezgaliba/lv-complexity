@@ -17,7 +17,7 @@ function Manual() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`https://sarezgitiba-flask-yhf42gzwra-lm.a.run.app/?text=${text}`);
+      const response = await axios.get(`https://sarezgitiba-flask-yhf42gzwra-lm.a.run.app/statistics?text=${text}`);
       const data = response.data;
       setData(data);
       setLoading(true);
