@@ -5,6 +5,8 @@ Teksta sarežģītības noteikšana ir dabiskās valodas apstrādes nozares uzde
 
 Risinājums ir ieviests bezmaksas Google mākoņa pakalpojumā, izstrādāts Python valodā ar to NLP/ML bibliotēkām un grafiskajai saskarnei izmantots React.js
 
+Autors: Māris K., LU Datorikas Fakultātes 4. kursa students, 2023./2024. m.g.
+
 # Darbināšana lokāli
 
 Nepiciešams Python, pieejams: https://www.python.org/downloads/
