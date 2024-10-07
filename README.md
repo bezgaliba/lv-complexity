@@ -7,12 +7,6 @@ Risinājums ir ieviests bezmaksas Google mākoņa pakalpojumā, izstrādāts Pyt
 
 Autors: Māris K., LU Datorikas Fakultātes 4. kursa students, 2023./2024. m.g.
 
-# Darbināšana lokāli
-
-Nepiciešams Python, pieejams: https://www.python.org/downloads/
-CL interpretorā palaist komandu `pip install requests/nltk/spacy/pyfiglet`
-Norādiet direktoriju, kur stāv lv-complexity direktorija un darbiniet programmu `python lv-complexity -t TEXT_FILE.txt`, kur TEXT_FILE.txt ir jūsu pakļavīgs teksta fails ar tekstu saturu, kuru vēlaties izanalizēt. 
-
 # Paldies šiem autoriem par izmantotajiem rīkiem:
 
 - NLP-Pipe rīks latviešu valodai:  A. Znotiņš, P. Paikens, D. Goško; G. Bārzdiņš, N. Grūzītis, 2018, NLP-PIPE: Latvian NLP Tool Pipeline, CLARIN-LV digital library at IMCS, University of Latvia, Riga http://hdl.handle.net/20.500.12574/4 
