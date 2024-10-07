@@ -1,5 +1,5 @@
 # lv-complexity
-Bakalaura darba ietvaros apskatīts NLP uzdevums - teksta sarežģītības noteikšana klāt ar šī rīka izveidi, kas ir publiski pieejams saitē [sarezgitiba.lv](https://sarezgitiba.lv/)
+Bakalaura darba ietvaros apskatīts NLP uzdevums - teksta sarežģītības noteikšana klāt ar šī rīka izveidi.
 
 Teksta sarežģītības noteikšana ir dabiskās valodas apstrādes nozares uzdevums, kas nosaka  rakstiska teksta leksisko, sintaktisko struktūru, lasāmības un uztveras grūtības pakāpi, ņemot vērā atdalot to trijās galvenās raksturojošās komponentes – tekstu raksturojošos kvantitatīvos rādītājus, teksta kvalitāti un lasītāja pieredzi un zināšanas.
 
